@@ -7,4 +7,4 @@
 * numpy
 * pandas
 
-_**Executable** will be available in future_
+_**Executable** will be available in the future._

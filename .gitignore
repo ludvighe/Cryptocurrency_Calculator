@@ -1,0 +1,7 @@
+logs/*
+tester.py
+__pycache__
+gui/__pycache__
+logs/__pycache__
+tools/__pycache__
+savedata/__pycache__

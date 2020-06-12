@@ -7,6 +7,7 @@ class CurrencyCard:
 
 
     def __init__(self, parent, BG_COLOR, WIDGET_COLOR, index:int, cdata:pd.DataFrame):
+        self.parent = parent
         self.index = index 
         self.data = cdata 
 
@@ -15,7 +16,7 @@ class CurrencyCard:
         else:
             bg = BG_COLOR[0]
 
-        self.frame = Frame(parent, bg=bg)
+        self.frame = Frame(parent.frame, bg=bg)
         cols = 0
         #self.in_label = Label(self.frame, text=f"Conversion {index}", bg=bg, fg=WIDGET_COLOR[0])
         #self.in_label.grid(row=0, column=0)
@@ -59,10 +60,11 @@ class CurrencyCard:
             self.result_usd = self.result * float(out_usd)
             self.out_entry.insert(0, self.result)
         except:
-            #HANDLE THIS!
+            print(f"Could not calculate values for {self.in_label.get()}")
             pass
     
     def remove_ccard(self):
+        self.parent.ccard_list.remove(self)
         self.frame.destroy()
 
     def get_calculated(self):
@@ -71,3 +73,7 @@ class CurrencyCard:
 
     def update_cdata(self, s_api):
         self.cdata = s_api.cdata
+
+    def get_log_data(self):
+        self.calculate()
+        return [self.in_label.get(), self.result_usd]

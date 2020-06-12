@@ -4,6 +4,7 @@ from tkinter import ttk
 import numpy as np
 import pandas as pd
 from gui import currency_card
+from tools import logger
 
 
 class CalcFrame:
@@ -13,6 +14,7 @@ class CalcFrame:
         self.BG_COLOR = BG_COLOR
         self.WIDGET_COLOR = WIDGET_COLOR
         self.cdata = s_api.cdata
+        self.lgr = logger.Logger()
 
         self.frame = Frame(parent, bg=self.BG_COLOR[0])
 
@@ -30,13 +32,17 @@ class CalcFrame:
         self.total_cbox.place(relwidth=0.15, relheight=0.5, relx=0.05, rely=0.25)
         self.total_entry = Entry(sub_frame)
         self.total_entry.place(relwidth=0.5, relheight=0.5, relx=0.25, rely=0.25)
-        Button(sub_frame, bg=WIDGET_COLOR[0], fg=WIDGET_COLOR[1], text="Calculate total", command=self.calc_total).place(relwidth=0.2, relheight=1, relx=0.8, rely=0)
+        Button(sub_frame, bg=WIDGET_COLOR[0], fg=WIDGET_COLOR[1], text="Calculate total", command=self.calc_total).place(relwidth=0.1, relheight=1, relx=0.8, rely=0)
+        Button(sub_frame, bg=WIDGET_COLOR[0], fg=WIDGET_COLOR[1], text="Log", command=self.log).place(relwidth=0.1, relheight=1, relx=0.9, rely=0)
 
     def add_ccard(self):
-        c = currency_card.CurrencyCard(self.frame, self.BG_COLOR, self.WIDGET_COLOR, len(self.ccard_list), self.cdata)
+        if len(self.ccard_list) <= 0:
+            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, len(self.ccard_list), self.cdata)
+        else:
+            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, (self.ccard_list[len(self.ccard_list) - 1].index + 1), self.cdata)
         self.ccard_list.append(c)
         c.frame.grid(row=self.rows, column=0)
-        self.rows = len(self.ccard_list) + 1
+        self.rows += 1
     
 
     def calc_total(self):
@@ -62,3 +68,14 @@ class CalcFrame:
         self.cdata = s_api.cdata
         for i in self.ccard_list:
             i.update_cdata(s_api)
+
+    def log(self):
+        data = list()
+        labels = list()
+
+        for i in self.ccard_list:
+            res = i.get_log_data()
+            labels.append(res[0])
+            data.append(res[1])
+
+        self.lgr.log_calcs(data, labels)

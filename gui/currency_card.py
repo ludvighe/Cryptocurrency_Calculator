@@ -9,7 +9,13 @@ class CurrencyCard:
     def __init__(self, parent, BG_COLOR, WIDGET_COLOR, index:int, cdata:pd.DataFrame):
         self.parent = parent
         self.index = index 
-        self.data = cdata 
+        self.cdata = cdata 
+
+        self.currency_strs = list()
+        for i in range(len(self.cdata)):
+            name = self.cdata["name"][i]
+            symbol = self.cdata["symbol"][i]
+            self.currency_strs.append(f"{name} ({symbol})")
 
         if (index % 2) == 0:
             bg = BG_COLOR[1]
@@ -33,7 +39,8 @@ class CurrencyCard:
         self.in_entry = Entry(self.frame)
         self.in_entry.grid(row=0, column=cols); cols += 1
 
-        self.in_currency_cbox = ttk.Combobox(self.frame, values=self.data["symbol"].to_string(index=False))
+        self.in_currency_cbox = ttk.Combobox(self.frame, values=self.currency_strs)
+        self.in_currency_cbox.current(1)
         self.in_currency_cbox.grid(row=0, column=cols); cols += 1
 
         Label(self.frame, text="    ===>    ", bg=bg, fg=WIDGET_COLOR[0]).grid(row=0, column=cols)
@@ -42,7 +49,8 @@ class CurrencyCard:
         self.out_entry = Entry(self.frame, textvariable="")
         self.out_entry.grid(row=0, column=cols); cols += 1
 
-        self.out_currency_cbox = ttk.Combobox(self.frame, values=self.data["symbol"].to_string(index=False))
+        self.out_currency_cbox = ttk.Combobox(self.frame, values=self.currency_strs)
+        self.out_currency_cbox.current(0)
         self.out_currency_cbox.grid(row=0, column=cols); cols +=1
         
         self.calc_btn = Button(self.frame, text="Calculate", bg=WIDGET_COLOR[0], fg=WIDGET_COLOR[1], command=self.calculate)
@@ -51,16 +59,17 @@ class CurrencyCard:
     def calculate(self):
         try:
             self.out_entry.delete(0, END)
-            in_cdata = self.data.loc[self.data["symbol"] == self.in_currency_cbox.get()].to_numpy()
-            out_cdata = self.data.loc[self.data["symbol"] == self.out_currency_cbox.get()].to_numpy()
-            in_usd = in_cdata[0][2]
-            out_usd = out_cdata[0][2]
-            self.exchange_rate = float(in_usd) / float(out_usd)
+            in_cdata = self.cdata.iloc[self.in_currency_cbox.current()].to_numpy()
+            out_cdata = self.cdata.loc[self.out_currency_cbox.current()].to_numpy()
+            in_usd = float(in_cdata[2])
+            out_usd = float(out_cdata[2])
+            self.exchange_rate = in_usd / out_usd
             self.result = float(self.in_entry.get()) * self.exchange_rate
-            self.result_usd = self.result * float(out_usd)
+            self.result_usd = self.result * out_usd
             self.out_entry.insert(0, self.result)
-        except:
-            print(f"Could not calculate values for {self.in_label.get()}")
+            #print(f"Calculated {in_cdata[2]} USD worth of {in_cdata[1]} to {out_cdata[2]} USD worth of {out_cdata[1]}\nWith exchange rate: {self.exchange_rate}%")
+        except Exception as e:
+            print(f"Could not calculate values for {self.in_label.get()}:\n{e}")
             pass
     
     def remove_ccard(self):

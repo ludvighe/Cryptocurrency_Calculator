@@ -29,6 +29,7 @@ class CalcFrame:
         sub_frame.place(relwidth=1, relheight=0.1, relx=0, rely=0.9)
 
         self.total_cbox = ttk.Combobox(sub_frame, values=self.cdata["symbol"].to_string(index=False))
+        self.total_cbox.current(0)
         self.total_cbox.place(relwidth=0.15, relheight=0.5, relx=0.05, rely=0.25)
         self.total_entry = Entry(sub_frame)
         self.total_entry.place(relwidth=0.5, relheight=0.5, relx=0.25, rely=0.25)

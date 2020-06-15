@@ -46,10 +46,10 @@ class CalcFrame:
     
 
     def calc_total(self):
-        total = 0
+        self.total_usd = 0
         try:
             for i in self.ccard_list:
-                total += i.get_calculated()[1]
+                self.total_usd += i.get_calculated()[1]
              
             self.total_entry.delete(0, END)
             in_cdata = self.cdata.loc[self.cdata["symbol"] == "BTC"].to_numpy()
@@ -57,11 +57,11 @@ class CalcFrame:
             in_usd = in_cdata[0][3]
             out_usd = out_cdata[0][2]
             self.exchange_rate = float(in_usd) / float(out_usd)
-            self.result = float(total) * self.exchange_rate
+            self.result = float(self.total_usd) * self.exchange_rate
             self.total_entry.insert(0, self.result)
         
-        except:
-            #HANDLE THIS!!
+        except Exception as e:
+            print(f"Could not calculate total:\n{e}")
             pass
 
     def refresh_cdata(self, s_api):
@@ -70,12 +70,19 @@ class CalcFrame:
             i.update_cdata(s_api)
 
     def log(self):
+        self.calc_total()
+
         data = list()
         labels = list()
+        #total = 0
 
         for i in self.ccard_list:
             res = i.get_log_data()
             labels.append(res[0])
             data.append(res[1])
+            #total += res[1]
+
+        data.append(self.total_usd)
+        labels.append("Total") 
 
         self.lgr.log_calcs(data, labels)

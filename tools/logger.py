@@ -3,7 +3,13 @@ import datetime as dt
 
 class Logger:
     def __init__(self):
-        self.calcs_log_path = "logs/calc_log.txt"
+        self.calcs_log_path = "logs/calc_log_test.txt"
+        pd.set_option('display.max_rows', None)
+
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.width', None)
+        pd.set_option('display.max_colwidth', -1)
+
 
     def log_calcs(self, data, labels):
         print(data)

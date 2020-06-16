@@ -7,12 +7,44 @@ class ShrimpyAPI:
         self.public_key = public_key
         self.secret_key = secret_key
         self.current_exchange = "binance"
+        #np.set_printoptions(suppress=True, formatter={'float_kind':'{:8f}'.format})
+        #pd.options.display.float_format = '{:20,.9f}'.format
         self.refresh()
 
-    #Get data from Shrimpy's API
     def refresh(self):
+        #Get data from Shrimpy's API
         client = shrimpy.ShrimpyApiClient(self.public_key, self.secret_key)
         self.cdata = pd.DataFrame(client.get_ticker(self.current_exchange))
         self.exchanges = pd.DataFrame(client.get_supported_exchanges())
-    
+
+        #Currency strings for comboboxes
+        self.currency_strs = list()
+
+        appendices = list()
+
+        for i in range(len(self.cdata)):
+            name = self.cdata["name"][i]
+            symbol = self.cdata["symbol"][i]
+            self.currency_strs.append(f"{name} ({symbol})")
+
+            #Other support
+            hundred_millionth = 0.00000001
+            if symbol in ["BTC", "ETH", "LTC"]:
+                hmil_usd = np.multiply(float(self.cdata["priceUsd"][i]), hundred_millionth)
+                hmil_btc = np.multiply(float(self.cdata["priceBtc"][i]), hundred_millionth)
+                pchange = self.cdata["percentChange24hUsd"][i]
+                updated = self.cdata["lastUpdated"][i]
+                
+                if symbol == "BTC":
+                    appendices.append(pd.DataFrame([["Satoshi", symbol, hmil_usd, hmil_btc, pchange, updated]], columns=self.cdata.columns))
+                elif symbol == "ETH":
+                    appendices.append(pd.DataFrame([["Gwei", symbol, hmil_usd, hmil_btc, pchange, updated]], columns=self.cdata.columns))
+                elif symbol == "LTC":
+                    appendices.append(pd.DataFrame([["Litoshi", symbol, hmil_usd, hmil_btc, pchange, updated]], columns=self.cdata.columns))
+        
+        for df in appendices:
+            self.cdata = self.cdata.append(df, ignore_index=True)
+            name = df["name"][0]
+            symbol = df["symbol"][0]
+            self.currency_strs.append(f"{name} ({symbol})")
 

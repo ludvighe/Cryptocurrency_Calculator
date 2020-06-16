@@ -5,10 +5,10 @@ class Logger:
     def __init__(self):
         self.calcs_log_path = "logs/calc_log_test.txt"
         pd.set_option('display.max_rows', None)
-
         pd.set_option('display.max_columns', None)
         pd.set_option('display.width', None)
         pd.set_option('display.max_colwidth', None)
+        pd.options.display.float_format = '{:20,.9f}'.format
 
 
     def log_calcs(self, data, labels):

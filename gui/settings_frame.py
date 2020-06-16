@@ -35,11 +35,11 @@ class SettingsFrame:
         self.rows += 1
 
         Label(self.frame, text="Default currency: from", bg=self.BG_COLOR[0], fg=self.WIDGET_COLOR[0]).grid(row=self.rows, column=0, sticky="w")
-        self.cfrom_cbox = ttk.Combobox(self.frame, values=s_api.cdata["symbol"].to_string(index=False))
+        self.cfrom_cbox = ttk.Combobox(self.frame, values=s_api.currency_strs)
         self.cfrom_cbox.grid(row=self.rows, column=1, sticky="w"); self.rows += 1 
         
         Label(self.frame, text="Default currency: to", bg=self.BG_COLOR[0], fg=self.WIDGET_COLOR[0]).grid(row=self.rows, column=0, sticky="w")
-        self.cto_cbox = ttk.Combobox(self.frame, values=s_api.cdata["symbol"].to_string(index=False))
+        self.cto_cbox = ttk.Combobox(self.frame, values=s_api.currency_strs)
         self.cto_cbox.grid(row=self.rows, column=1, sticky="w"); self.rows += 1 
 
         self.separator(2) 

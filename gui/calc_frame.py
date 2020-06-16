@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from gui import currency_card
 from tools import logger
+import traceback
 
 
 class CalcFrame:
@@ -13,9 +14,10 @@ class CalcFrame:
     def __init__(self, parent, BG_COLOR, WIDGET_COLOR, s_api):
         self.BG_COLOR = BG_COLOR
         self.WIDGET_COLOR = WIDGET_COLOR
+        self.s_api = s_api
         self.cdata = s_api.cdata
         self.lgr = logger.Logger()
-
+        
         self.frame = Frame(parent, bg=self.BG_COLOR[0])
 
         self.rows = 0
@@ -28,7 +30,7 @@ class CalcFrame:
         sub_frame = Frame(self.frame, bg=WIDGET_COLOR[0])
         sub_frame.place(relwidth=1, relheight=0.1, relx=0, rely=0.9)
 
-        self.total_cbox = ttk.Combobox(sub_frame, values=self.cdata["symbol"].to_string(index=False))
+        self.total_cbox = ttk.Combobox(sub_frame, values=self.s_api.currency_strs)
         self.total_cbox.current(0)
         self.total_cbox.place(relwidth=0.15, relheight=0.5, relx=0.05, rely=0.25)
         self.total_entry = Entry(sub_frame)
@@ -38,9 +40,9 @@ class CalcFrame:
 
     def add_ccard(self):
         if len(self.ccard_list) <= 0:
-            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, len(self.ccard_list), self.cdata)
+            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, len(self.ccard_list), self.s_api)
         else:
-            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, (self.ccard_list[len(self.ccard_list) - 1].index + 1), self.cdata)
+            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, (self.ccard_list[len(self.ccard_list) - 1].index + 1), self.s_api)
         self.ccard_list.append(c)
         c.frame.grid(row=self.rows, column=0)
         self.rows += 1
@@ -54,16 +56,17 @@ class CalcFrame:
              
             self.total_entry.delete(0, END)
             in_cdata = self.cdata.loc[self.cdata["symbol"] == "BTC"].to_numpy()
-            out_cdata = self.cdata.loc[self.cdata["symbol"] == self.total_cbox.get()].to_numpy()
+            out_cdata = self.cdata.iloc[self.total_cbox.current()].to_numpy()
             in_usd = in_cdata[0][3]
-            out_usd = out_cdata[0][2]
-            self.exchange_rate = float(in_usd) / float(out_usd)
-            self.result = float(self.total_usd) * self.exchange_rate
-            self.total_entry.insert(0, self.result)
+            out_usd = out_cdata[2]
+            self.exchange_rate = np.divide(float(in_usd), float(out_usd))
+            self.result = np.multiply(float(self.total_usd), self.exchange_rate)
+            self.total_entry.insert(0, '{:.20f}'.format(self.result).rstrip("0"))
         
         except Exception as e:
+            print(in_cdata)
+            print(out_cdata)
             print(f"Could not calculate total:\n{e}")
-            pass
 
     def refresh_cdata(self, s_api):
         self.cdata = s_api.cdata

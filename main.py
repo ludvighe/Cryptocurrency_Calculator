@@ -40,9 +40,8 @@ class Main:
             #Init cryptocurrency market data from Shirimpy's API
             self.s_api = shrimpy_api.ShrimpyAPI(self.kframe.p_key_entry.get(), self.kframe.s_key_entry.get())
             self.key_enetered = True
-        except:
-            print("Could not get data from Shrimpy")
-            pass
+        except Exception as e:
+            print(f"Could not get data from Shrimpy:\n{e}")
         
         if self.key_enetered:
 

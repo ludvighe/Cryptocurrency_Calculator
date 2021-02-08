@@ -7,7 +7,7 @@ import traceback
 class CurrencyCard:
 
 
-    def __init__(self, parent, BG_COLOR, WIDGET_COLOR, index:int, s_api):
+    def __init__(self, parent, BG_COLOR, WIDGET_COLOR, index:int, s_api, symbol_from="", symbol_to=""):
         self.parent = parent
         self.index = index 
         self.cdata = s_api.cdata 
@@ -35,7 +35,14 @@ class CurrencyCard:
         self.in_entry.grid(row=0, column=cols); cols += 1
 
         self.in_currency_cbox = ttk.Combobox(self.frame, values=s_api.currency_strs)
-        self.in_currency_cbox.current(1)
+        if symbol_from != "":
+            try:
+                self.in_currency_cbox.current(s_api.currency_str_index(symbol_from))
+            except:    
+                self.in_currency_cbox.current(1)
+        else:
+            self.in_currency_cbox.current(1)
+
         self.in_currency_cbox.grid(row=0, column=cols); cols += 1
 
         Label(self.frame, text="    ===>    ", bg=bg, fg=WIDGET_COLOR[0]).grid(row=0, column=cols)
@@ -45,7 +52,15 @@ class CurrencyCard:
         self.out_entry.grid(row=0, column=cols); cols += 1
 
         self.out_currency_cbox = ttk.Combobox(self.frame, values=s_api.currency_strs)
-        self.out_currency_cbox.current(0)
+
+        if symbol_to != "":
+            try:
+                self.out_currency_cbox.current(s_api.currency_str_index(symbol_to))
+            except:
+                self.out_currency_cbox.current(0)
+        else:
+            self.out_currency_cbox.current(0)
+            
         self.out_currency_cbox.grid(row=0, column=cols); cols +=1
         
         self.calc_btn = Button(self.frame, text="Calculate", bg=WIDGET_COLOR[0], fg=WIDGET_COLOR[1], command=self.calculate)

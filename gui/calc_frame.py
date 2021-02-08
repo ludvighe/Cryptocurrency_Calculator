@@ -6,6 +6,7 @@ import pandas as pd
 from gui import currency_card
 from tools import logger
 import traceback
+import json
 
 
 class CalcFrame:
@@ -20,9 +21,20 @@ class CalcFrame:
         
         self.frame = Frame(parent, bg=self.BG_COLOR[0])
 
+        # Load Settings
+        with open("settings.json") as f:
+            global settings
+            settings = json.load(f)
+
         self.rows = 0
         self.ccard_list = list()
-        self.add_ccard()
+
+        if len(settings["initial_pairs"]) > 0:
+            for pair in settings['initial_pairs']:
+                print(pair)
+                self.add_ccard(symbol_from=pair[0], symbol_to=pair[1])
+        else:
+            self.add_ccard()
 
         Button(self.frame, text="+", fg=WIDGET_COLOR[0], command=self.add_ccard).grid(row=100, column=0, sticky="w")
 
@@ -31,18 +43,18 @@ class CalcFrame:
         sub_frame.place(relwidth=1, relheight=0.1, relx=0, rely=0.9)
 
         self.total_cbox = ttk.Combobox(sub_frame, values=self.s_api.currency_strs)
-        self.total_cbox.current(0)
+        self.total_cbox.current(s_api.currency_str_index(settings["initial_total_token"]))
         self.total_cbox.place(relwidth=0.15, relheight=0.5, relx=0.05, rely=0.25)
         self.total_entry = Entry(sub_frame)
         self.total_entry.place(relwidth=0.5, relheight=0.5, relx=0.25, rely=0.25)
         Button(sub_frame, bg=WIDGET_COLOR[0], fg=WIDGET_COLOR[1], text="Calculate total", command=self.calc_total).place(relwidth=0.1, relheight=1, relx=0.8, rely=0)
         Button(sub_frame, bg=WIDGET_COLOR[0], fg=WIDGET_COLOR[1], text="Log", command=self.log).place(relwidth=0.1, relheight=1, relx=0.9, rely=0)
 
-    def add_ccard(self):
+    def add_ccard(self, symbol_from="", symbol_to=""):
         if len(self.ccard_list) <= 0:
-            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, len(self.ccard_list), self.s_api)
+            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, len(self.ccard_list), self.s_api, symbol_from=symbol_from, symbol_to=symbol_to)
         else:
-            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, (self.ccard_list[len(self.ccard_list) - 1].index + 1), self.s_api)
+            c = currency_card.CurrencyCard(self, self.BG_COLOR, self.WIDGET_COLOR, (self.ccard_list[len(self.ccard_list) - 1].index + 1), self.s_api, symbol_from=symbol_from, symbol_to=symbol_to)
         self.ccard_list.append(c)
         c.frame.grid(row=self.rows, column=0)
         self.rows += 1

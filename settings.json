@@ -1,0 +1,10 @@
+{
+    "default_exchange": "binance",
+    "initial_pairs": [
+        ["Satoshi", "BTC"],
+        ["USDC", "USDT"],
+        ["BTC", "USDC"],
+        ["LINK", "USDC"]
+    ],
+    "initial_total_token": "USDC"
+}

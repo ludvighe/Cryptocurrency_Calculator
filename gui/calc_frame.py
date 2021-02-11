@@ -31,7 +31,6 @@ class CalcFrame:
 
         if len(settings["initial_pairs"]) > 0:
             for pair in settings['initial_pairs']:
-                print(pair)
                 self.add_ccard(symbol_from=pair[0], symbol_to=pair[1])
         else:
             self.add_ccard()

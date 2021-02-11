@@ -54,5 +54,4 @@ class ShrimpyAPI:
     def currency_str_index(self, s):
         for i in range(len(self.currency_strs)):
             if s in self.currency_strs[i]: 
-                print(f"Found: {self.currency_strs[i]}")
                 return i

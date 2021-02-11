@@ -1,0 +1,1 @@
+%~dp0/../ccalc-venv/Scripts/python.exe start.py
